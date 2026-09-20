@@ -102,6 +102,7 @@ const productionFast4Add=$('#add').onclick;$('#add').onclick=()=>{productionFast
 const productionNoExtrasAdd=$('#add').onclick;$('#add').onclick=()=>{productionNoExtrasAdd();if(active==='Producción'){const extras=$('#f7');if(extras){const field=extras.closest('.field');if(field)field.hidden=true;}}};
 const productionNoGiftAdd=$('#add').onclick;$('#add').onclick=()=>{productionNoGiftAdd();if(active==='Producción'){const gift=$('#f8');if(gift){const field=gift.closest('.field');if(field)field.hidden=true;}}};
 const productionExtraAdd=$('#add').onclick;$('#add').onclick=()=>{productionExtraAdd();if(active==='Producción'){const extra=$('#f8');if(extra){const field=extra.closest('.field');if(field)field.hidden=false;const label=field?.querySelector('label');if(label)label.textContent='Elemento extra';extra.placeholder='Añade cualquier elemento extra';}}};
+const productionExtraRefsAdd=$('#add').onclick;$('#add').onclick=()=>{productionExtraRefsAdd();if(active==='Producción'){const extra=$('#f8');if(extra){extra.outerHTML='<select id="f8"></select>';const sel=$('#f8');sel.innerHTML='<option>Ninguno</option>'+sourceData.items.filter(x=>['PAI','Fast','Moonshot'].includes(String(x[5]))).map(x=>'<option>'+x[0]+' · '+cleanLabel(x[1])+' · '+x[5]+'</option>').join('');}}};
 </script>
 </body>
 </html>
