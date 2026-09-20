@@ -59,8 +59,8 @@ const catalogChanges=JSON.parse(localStorage.getItem('catalogChanges')||'{"add":
 catalogChanges.remove.forEach(ref=>{const i=itemRows.findIndex(r=>r[0]===ref);if(i>=0)itemRows.splice(i,1)});
 catalogChanges.add.forEach(r=>{if(!itemRows.some(x=>x[0]===r[0]))itemRows.push(r)});
 const definedLimits=sourceData.items.filter(x=>x[2]!==null).length;
-config['Producción'].cols=['Fecha','Nº instalación','Actividad','Cliente','Modalidad','Kit','Tarjeta','Sentinel/Mando','Regalo','Notas','Estado'];
-config['Producción'].fields=[['Fecha','date'],['Nº instalación','text'],['Actividad','text'],['Cliente','text'],['Modalidad','text'],['Kit','text'],['Tarjeta','text'],['Sentinel/Mando','text'],['Regalo','text'],['Notas','text']];
+config['Producción'].cols=['Fecha','Nº instalación','Actividad','Cliente','Modalidad','Kit','Tarjeta','Sentinel/Mando','Elemento extra','Notas','Estado'];
+config['Producción'].fields=[['Fecha','date'],['Nº instalación','text'],['Actividad','text'],['Cliente','text'],['Modalidad','text'],['Kit','text'],['Tarjeta','text'],['Sentinel/Mando','text'],['Elemento extra','text'],['Notas','text']];
 config.Stock.stats=[['Referencias del catálogo','124','Todas las filas de Item list'],['Con límite de stock',String(definedLimits),'Definidas en Item list'],['Sin límite',''+(sourceData.items.length-definedLimits),'Revisar cuando proceda'],['Categorías',String(new Set(sourceData.items.map(x=>x[3]).filter(Boolean)).size),'Clasificación del catálogo']];
 config.Stock.cols=['Referencia','Descripción','Límite','Categoría','Subcategoría','Tecnología','€/unidad'];
 config.Stock.rows=itemRows;
@@ -101,6 +101,7 @@ const productionPaiModeAdd=$('#add').onclick;$('#add').onclick=()=>{productionPa
 const productionFast4Add=$('#add').onclick;$('#add').onclick=()=>{productionFast4Add();if(active==='Producción'){const card=$('#f6');if(card)card.innerHTML='<option>Sin cambio</option><option>9114 · Tarjeta SIM Vodafone VF4 4G · Fast4</option><option>9115 · Tarjeta SIM Orange VF4 4G · Fast4</option>';}};
 const productionNoExtrasAdd=$('#add').onclick;$('#add').onclick=()=>{productionNoExtrasAdd();if(active==='Producción'){const extras=$('#f7');if(extras){const field=extras.closest('.field');if(field)field.hidden=true;}}};
 const productionNoGiftAdd=$('#add').onclick;$('#add').onclick=()=>{productionNoGiftAdd();if(active==='Producción'){const gift=$('#f8');if(gift){const field=gift.closest('.field');if(field)field.hidden=true;}}};
+const productionExtraAdd=$('#add').onclick;$('#add').onclick=()=>{productionExtraAdd();if(active==='Producción'){const extra=$('#f8');if(extra){const field=extra.closest('.field');if(field)field.hidden=false;const label=field?.querySelector('label');if(label)label.textContent='Elemento extra';extra.placeholder='Añade cualquier elemento extra';}}};
 </script>
 </body>
 </html>
