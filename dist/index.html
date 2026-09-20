@@ -145,8 +145,9 @@ const editClosureBtn=document.createElement('button');editClosureBtn.className='
 editClosureBtn.hidden=true;const closureSelect=select;select=name=>{closureSelect(name);editClosureBtn.hidden=name!=='Cierre';};
 // Accept both decimal PR values (0.85) and percentage entry (85), preserving blanks.
 const tierPercent=(v,map)=>{let n=Number(String(v??'').replace(',','.').replace('%','').trim());if(!Number.isFinite(n)||String(v).trim()==='')return '';if(n>1)n/=100;let out='';for(const [limit,eur] of map)if(n>=limit)out=eur;return out;};
-const appTierPercent=(v)=>{let n=Number(String(v??'').replace(',','.').replace('%','').trim());if(!Number.isFinite(n)||String(v).trim()==='')return '';if(n>1)n/=100;if(n<0.8)return -50;return tierPercent(n,prApp);};
-const closureRefreshWithPercent=refreshComputedClosure;refreshComputedClosure=()=>{closureRefreshWithPercent();const r=config.Cierre.rows[0];if(r){r[4]=tierPercent(closureInputs.nps,prNps);r[6]=appTierPercent(closureInputs.app);}};
+const appTierPercent=(v)=>{let n=Number(String(v??'').replace(',','.').replace('%','').trim());if(!Number.isFinite(n)||String(v).trim()==='')return '';if(n>1)n/=100;if(n<0.8)return 0;return tierPercent(n,prApp);};
+const npsTierPercent=(v)=>{let n=Number(String(v??'').replace(',','.').replace('%','').trim());if(!Number.isFinite(n)||String(v).trim()==='')return '';if(n>1)n/=100;if(n<=0.8)return -100;return tierPercent(n,prNps);};
+const closureRefreshWithPercent=refreshComputedClosure;refreshComputedClosure=()=>{closureRefreshWithPercent();const r=config.Cierre.rows[0];if(r){r[4]=npsTierPercent(closureInputs.nps);r[6]=appTierPercent(closureInputs.app);}};
 </script>
 </body>
 </html>
