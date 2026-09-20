@@ -135,6 +135,7 @@ const returnSubmit=$('#form').onsubmit;$('#form').onsubmit=e=>{if(active==='Stoc
 const returnBothOut=$('#form').onsubmit;$('#form').onsubmit=e=>{if(active==='Stock'&&$('#retType')){if(e.submitter?.value==='cancel')return;e.preventDefault();for(let i=1;i<=5;i++){const ref=$('#retRef'+i).value,q=Number($('#retQty'+i).value||0);if(ref&&q)stockCounts[ref]=Number(stockCounts[ref]||0)-q;}localStorage.setItem('stockCounts',JSON.stringify(stockCounts));$('#dialog').close();select('Stock');return;}returnBothOut(e);};
 function refreshComputedClosure(){const rows=config.Producción.rows||[];const inst=rows.filter(r=>String(r[2]||'').toLowerCase().includes('instal')).length;const mant=rows.filter(r=>String(r[2]||'').toLowerCase().includes('manten')).length;const prod=inst+mant*.5;config.Cierre.rows=[['Actual',0,0,'',0,0,0,0,0,0,inst,mant,prod,'Calculado']];}
 const computedSelect=select;select=name=>{if(name==='Cierre')refreshComputedClosure();computedSelect(name);const add=$('#add');if(add)add.hidden=name==='Cierre';};
+returnBtn.addEventListener('click',()=>setTimeout(()=>$('#retMat')?.closest('.field')?.remove(),0));
 </script>
 </body>
 </html>
