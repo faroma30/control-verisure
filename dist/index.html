@@ -136,6 +136,7 @@ const returnBothOut=$('#form').onsubmit;$('#form').onsubmit=e=>{if(active==='Sto
 function refreshComputedClosure(){const rows=config.Producción.rows||[];const inst=rows.filter(r=>String(r[2]||'').toLowerCase().includes('instal')).length;const mant=rows.filter(r=>String(r[2]||'').toLowerCase().includes('manten')).length;const prod=inst+mant*.5;config.Cierre.rows=[['Actual',0,0,'',0,0,0,0,0,0,inst,mant,prod,'Calculado']];}
 const computedSelect=select;select=name=>{if(name==='Cierre')refreshComputedClosure();computedSelect(name);const add=$('#add');if(add)add.hidden=name==='Cierre';};
 returnBtn.addEventListener('click',()=>setTimeout(()=>$('#retMat')?.closest('.field')?.remove(),0));
+const oldRefreshClosure=refreshComputedClosure;refreshComputedClosure=()=>{oldRefreshClosure();const now=new Date();if(config.Cierre.rows[0])config.Cierre.rows[0][0]=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');};
 </script>
 </body>
 </html>
