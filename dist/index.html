@@ -100,6 +100,7 @@ const productionKitOnlyAdd=$('#add').onclick;$('#add').onclick=()=>{productionKi
 const productionPaiModeAdd=$('#add').onclick;$('#add').onclick=()=>{productionPaiModeAdd();if(active==='Producción'){const client=$('#f3'),mode=$('#f4');if(client&&mode){const modeField=mode.closest('.field');const updateMode=()=>{if(modeField)modeField.hidden=client.value==='PAI';};client.addEventListener('change',updateMode);updateMode();}}};
 const productionFast4Add=$('#add').onclick;$('#add').onclick=()=>{productionFast4Add();if(active==='Producción'){const card=$('#f6');if(card)card.innerHTML='<option>Sin cambio</option><option>9114 · Tarjeta SIM Vodafone VF4 4G · Fast4</option><option>9115 · Tarjeta SIM Orange VF4 4G · Fast4</option>';}};
 const productionNoExtrasAdd=$('#add').onclick;$('#add').onclick=()=>{productionNoExtrasAdd();if(active==='Producción'){const extras=$('#f7');if(extras){const field=extras.closest('.field');if(field)field.hidden=true;}}};
+const productionNoGiftAdd=$('#add').onclick;$('#add').onclick=()=>{productionNoGiftAdd();if(active==='Producción'){const gift=$('#f8');if(gift){const field=gift.closest('.field');if(field)field.hidden=true;}}};
 </script>
 </body>
 </html>
