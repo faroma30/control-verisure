@@ -195,6 +195,7 @@ const otherIncidentBtn=document.createElement('button');otherIncidentBtn.classNa
 incidentBtn.textContent='Incumplimientos';
 incidentBtn.onclick=()=>{if(active!=='Producción')return;incidentMode=true;$('#modalSub').textContent='Registra un incumplimiento.';$('#fields').innerHTML='<div class="field"><label for="incidentDate">Fecha</label><input id="incidentDate" type="date" required></div><div class="field"><label for="incidentInstall">Nº de instalación</label><input id="incidentInstall" type="text" required></div><div class="field"><label for="incidentType">Motivo</label><select id="incidentType"><option>Incumplimiento de cliente</option><option>Incumplimiento técnico</option><option>Otros incumplimientos</option></select></div>';$('#dialog').showModal();};
 otherIncidentBtn.hidden=true;
+otherIncidentBtn.remove();
 </script>
 </body>
 </html>
