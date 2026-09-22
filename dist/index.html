@@ -196,6 +196,7 @@ incidentBtn.textContent='Incumplimientos';
 incidentBtn.onclick=()=>{if(active!=='Producción')return;incidentMode=true;$('#modalSub').textContent='Registra un incumplimiento.';$('#fields').innerHTML='<div class="field"><label for="incidentDate">Fecha</label><input id="incidentDate" type="date" required></div><div class="field"><label for="incidentInstall">Nº de instalación</label><input id="incidentInstall" type="text" required></div><div class="field"><label for="incidentType">Motivo</label><select id="incidentType"><option>Incumplimiento de cliente</option><option>Incumplimiento técnico</option><option>Otros incumplimientos</option></select></div>';$('#dialog').showModal();};
 otherIncidentBtn.hidden=true;
 otherIncidentBtn.remove();
+const closureRefreshIncidents=refreshComputedClosure;refreshComputedClosure=()=>{closureRefreshIncidents();const rows=config.Producción.rows||[];let client=0,tech=0,other=0;rows.forEach(r=>{const t=String(r[2]||'').toLowerCase();if(t.includes('incumplimiento de cliente'))client++;else if(t.includes('incumplimiento técnico')||t.includes('incumplimiento tecnico'))tech++;else if(t.includes('otros incumplimientos'))other++;});const r=config.Cierre.rows[0];if(r){r[8]=client+tech+other;r[9]=client;r[10]=tech;r[11]=other;const base=(Number(r[2])||0)+(Number(r[4])||0)+r[8];r[12]=base?client/base:0;r[13]=base?tech/base:0;r[14]=base?other/base:0;r[15]=base?(client+tech+other)/base:0;}};
 </script>
 </body>
 </html>
