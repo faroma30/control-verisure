@@ -216,6 +216,6 @@ let productionMonthFilter='';const productionMonthLabel=document.createElement('
 const selectFinalHistories=select;select=name=>{selectFinalHistories(name);if(oldTypeHistoryPanel)oldTypeHistoryPanel.hidden=true;if(separatedPanel)separatedPanel.hidden=name!=='Producción';if(name==='Producción'&&typeof renderSeparatedHistories==='function'){separatedPanel.hidden=false;renderSeparatedHistories();}};
 </script>
 <script>const hideEmptyIncidentHistory=()=>{if(incidentHistory)incidentHistory.hidden=active!=='Producción'||!(config.Producción.rows||[]).some(r=>String(r[2]||'').toLowerCase().includes('incumplimiento'));};const renderAfterIncidentHide=renderRows;renderRows=(filter='')=>{renderAfterIncidentHide(filter);hideEmptyIncidentHistory();};document.addEventListener('click',()=>setTimeout(hideEmptyIncidentHistory,0));hideEmptyIncidentHistory();</script>
-<script>setTimeout(()=>document.querySelectorAll('main h2,main h3').forEach(h=>{if(h.textContent.trim()==='Registros recientes')h.textContent='Producción';}),0);</script>
+<script>const normalizeProductionTitle=()=>document.querySelectorAll('main h2,main h3').forEach(h=>{if(h.textContent.trim()==='Registros recientes')h.textContent='Producción';});setTimeout(normalizeProductionTitle,300);setInterval(normalizeProductionTitle,1000);</script>
 </body>
 </html>
