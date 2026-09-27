@@ -498,9 +498,7 @@ const selectFinalHistories=select;select=name=>{selectFinalHistories(name);if(ol
 </script>
 <script>
 (()=>{
-  const button=[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==='Sincronizar referidos');
-  if(!button)return;
-  let waiting;
+  let waiting,currentButton;
   const field=(block,label,next)=>{const end=next?`(?=${next}\\s*:)`:'$';return (block.match(new RegExp(`${label}\\s*:\\s*([\\s\\S]*?)${end}`,'i'))?.[1]||'').trim();};
   const importText=text=>{
     const blocks=String(text||'').split(/(?=Núm inst:\s*)/i).filter(x=>/Núm inst:\s*/i.test(x));
@@ -517,13 +515,17 @@ const selectFinalHistories=select;select=name=>{selectFinalHistories(name);if(ol
     select('Referidos');
     return rows.length;
   };
-  button.onclick=()=>{
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('button');
+    if(!button||button.textContent.trim()!=='Sincronizar referidos')return;
+    event.preventDefault();event.stopImmediatePropagation();currentButton=button;
     clearTimeout(waiting);button.disabled=true;button.textContent='Sincronizando…';
     window.dispatchEvent(new Event('referidos-request-sync'));
     waiting=setTimeout(()=>{button.disabled=false;button.textContent='Sincronizar referidos';alert('No se recibió información. Abre Comparte Protección, pulsa allí “Sincronizar referidos” y vuelve a intentarlo.');},2500);
-  };
+  },true);
   window.addEventListener('referidos-sync',event=>{
     clearTimeout(waiting);
+    const button=currentButton||[...document.querySelectorAll('button')].find(x=>x.textContent.trim().includes('referidos'));
     try{const count=importText(event.detail);button.textContent=`${count} referidos sincronizados`;setTimeout(()=>button.textContent='Sincronizar referidos',1800);}
     catch(error){console.error(error);button.textContent='Sincronizar referidos';alert(error.message);}
     finally{button.disabled=false;}
