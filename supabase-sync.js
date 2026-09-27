@@ -9,6 +9,25 @@
   let authUser=null,profile=null,timer=0,applying=false,pendingPasswordUser=null,dirty=false,changeVersion=0,remoteUpdatedAt='';
   const managed=(key,user)=>key===`controlRecords_${user}`||key===`closureDays_${user}`||key===`closureHistory_${user}`||GLOBAL.includes(key);
   const snap=user=>{const out={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(managed(k,user))out[k]=localStorage.getItem(k);}return out;};
+  const parsed=value=>{try{return JSON.parse(value)}catch{return null}};
+  function mergeSnapshots(user,remote){
+    const local=snap(user),out={...(remote||{})},recordsKey=`controlRecords_${user}`;
+    const localRecords=parsed(local[recordsKey])||{},remoteRecords=parsed(out[recordsKey])||{},mergedRecords={...remoteRecords};
+    for(const [category,rows] of Object.entries(localRecords)){
+      if(!Array.isArray(rows)){mergedRecords[category]=rows;continue;}
+      const combined=[...rows,...(Array.isArray(remoteRecords[category])?remoteRecords[category]:[])],seen=new Set();
+      mergedRecords[category]=combined.filter(row=>{const id=JSON.stringify(row);if(seen.has(id))return false;seen.add(id);return true;});
+    }
+    if(Object.keys(mergedRecords).length)out[recordsKey]=JSON.stringify(mergedRecords);
+    for(const key of Object.keys(local)){
+      if(key===recordsKey)continue;
+      const l=parsed(local[key]),r=parsed(out[key]);
+      if(l&&r&&!Array.isArray(l)&&!Array.isArray(r))out[key]=JSON.stringify({...r,...l});
+      else if(Array.isArray(l)&&Array.isArray(r)){const seen=new Set();out[key]=JSON.stringify([...l,...r].filter(x=>{const id=JSON.stringify(x);if(seen.has(id))return false;seen.add(id);return true;}));}
+      else if(!(key in out))out[key]=local[key];
+    }
+    return out;
+  }
   const clear=user=>[...GLOBAL,`controlRecords_${user}`,`closureDays_${user}`,`closureHistory_${user}`].forEach(k=>localStorage.removeItem(k));
   function apply(user,data){applying=true;clear(user);Object.entries(data||{}).forEach(([k,v])=>{if(managed(k,user)&&v!==null)localStorage.setItem(k,String(v));});applying=false;}
   async function save(){
@@ -30,8 +49,8 @@
     localStorage.setItem('verisureCurrentUser',p.username);localStorage.setItem('verisureCurrentRole',p.role);
     const {data,error}=await db.from('user_data').select('data,updated_at').eq('user_id',user.id).single();if(error)throw error;
     remoteUpdatedAt=data?.updated_at||'';
-    const remote=data?.data||{};
-    if(Object.keys(remote).length){const before=JSON.stringify(snap(p.username));apply(p.username,remote);if(!afterLogin&&before!==JSON.stringify(remote)&&!sessionStorage.getItem('cvCloudReload')){sessionStorage.setItem('cvCloudReload','1');location.reload();return;}}
+    const remote=data?.data||{},combined=mergeSnapshots(p.username,remote);
+    if(Object.keys(combined).length){const before=JSON.stringify(snap(p.username));apply(p.username,combined);if(JSON.stringify(combined)!==JSON.stringify(remote))await save();if(!afterLogin&&before!==JSON.stringify(combined)&&!sessionStorage.getItem('cvCloudReload')){sessionStorage.setItem('cvCloudReload','1');location.reload();return;}}
     else{if(p.username!=='Q04780')clear(p.username);await save();}
     sessionStorage.removeItem('cvCloudReload');
   }
