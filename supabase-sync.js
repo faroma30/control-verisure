@@ -7,9 +7,9 @@
   const db=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true}});
   window.controlVerisureSupabase=db;
   let authUser=null,profile=null,timer=0,applying=false,pendingPasswordUser=null;
-  const managed=(key,user)=>key===`controlRecords_${user}`||key===`closureDays_${user}`||GLOBAL.includes(key);
+  const managed=(key,user)=>key===`controlRecords_${user}`||key===`closureDays_${user}`||key===`closureHistory_${user}`||GLOBAL.includes(key);
   const snap=user=>{const out={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(managed(k,user))out[k]=localStorage.getItem(k);}return out;};
-  const clear=user=>[...GLOBAL,`controlRecords_${user}`,`closureDays_${user}`].forEach(k=>localStorage.removeItem(k));
+  const clear=user=>[...GLOBAL,`controlRecords_${user}`,`closureDays_${user}`,`closureHistory_${user}`].forEach(k=>localStorage.removeItem(k));
   function apply(user,data){applying=true;clear(user);Object.entries(data||{}).forEach(([k,v])=>{if(managed(k,user)&&v!==null)localStorage.setItem(k,String(v));});applying=false;}
   async function save(){if(!authUser||!profile)return;const {error}=await db.from('user_data').upsert({user_id:authUser.id,data:snap(profile.username),updated_at:new Date().toISOString()});if(error)console.error(error);}
   function queue(){if(applying||!authUser||!profile)return;clearTimeout(timer);timer=setTimeout(save,400);}
