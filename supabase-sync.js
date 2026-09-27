@@ -6,13 +6,20 @@
   if(!window.supabase?.createClient)return;
   const db=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true}});
   window.controlVerisureSupabase=db;
-  let authUser=null,profile=null,timer=0,applying=false,pendingPasswordUser=null;
+  let authUser=null,profile=null,timer=0,applying=false,pendingPasswordUser=null,dirty=false,changeVersion=0,remoteUpdatedAt='';
   const managed=(key,user)=>key===`controlRecords_${user}`||key===`closureDays_${user}`||key===`closureHistory_${user}`||GLOBAL.includes(key);
   const snap=user=>{const out={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(managed(k,user))out[k]=localStorage.getItem(k);}return out;};
   const clear=user=>[...GLOBAL,`controlRecords_${user}`,`closureDays_${user}`,`closureHistory_${user}`].forEach(k=>localStorage.removeItem(k));
   function apply(user,data){applying=true;clear(user);Object.entries(data||{}).forEach(([k,v])=>{if(managed(k,user)&&v!==null)localStorage.setItem(k,String(v));});applying=false;}
-  async function save(){if(!authUser||!profile)return;const {error}=await db.from('user_data').upsert({user_id:authUser.id,data:snap(profile.username),updated_at:new Date().toISOString()});if(error)console.error(error);}
-  function queue(){if(applying||!authUser||!profile)return;clearTimeout(timer);timer=setTimeout(save,400);}
+  async function save(){
+    if(!authUser||!profile||applying)return;
+    const version=changeVersion,updatedAt=new Date().toISOString(),payload=snap(profile.username);
+    const {error}=await db.from('user_data').upsert({user_id:authUser.id,data:payload,updated_at:updatedAt});
+    if(error){console.error(error);dirty=true;return;}
+    remoteUpdatedAt=updatedAt;
+    if(version===changeVersion)dirty=false;else queue();
+  }
+  function queue(){if(applying||!authUser||!profile)return;dirty=true;changeVersion++;clearTimeout(timer);timer=setTimeout(save,60);}
   const nativeSet=Storage.prototype.setItem,nativeRemove=Storage.prototype.removeItem;
   Storage.prototype.setItem=function(k,v){nativeSet.call(this,k,v);if(this===localStorage&&profile&&managed(k,profile.username))queue();};
   Storage.prototype.removeItem=function(k){nativeRemove.call(this,k);if(this===localStorage&&profile&&managed(k,profile.username))queue();};
@@ -21,11 +28,21 @@
     authUser=user;profile=p;
     localStorage.setItem(CACHE,JSON.stringify({username:p.username,role:p.role}));
     localStorage.setItem('verisureCurrentUser',p.username);localStorage.setItem('verisureCurrentRole',p.role);
-    const {data,error}=await db.from('user_data').select('data').eq('user_id',user.id).single();if(error)throw error;
+    const {data,error}=await db.from('user_data').select('data,updated_at').eq('user_id',user.id).single();if(error)throw error;
+    remoteUpdatedAt=data?.updated_at||'';
     const remote=data?.data||{};
     if(Object.keys(remote).length){const before=JSON.stringify(snap(p.username));apply(p.username,remote);if(!afterLogin&&before!==JSON.stringify(remote)&&!sessionStorage.getItem('cvCloudReload')){sessionStorage.setItem('cvCloudReload','1');location.reload();return;}}
     else{if(p.username!=='Q04780')clear(p.username);await save();}
     sessionStorage.removeItem('cvCloudReload');
+  }
+  async function pull(){
+    if(!authUser||!profile||dirty||applying)return;
+    const {data,error}=await db.from('user_data').select('data,updated_at').eq('user_id',authUser.id).single();
+    if(error){console.error(error);return;}
+    if(!data?.updated_at||data.updated_at===remoteUpdatedAt)return;
+    remoteUpdatedAt=data.updated_at;
+    const remote=data.data||{};
+    if(JSON.stringify(snap(profile.username))!==JSON.stringify(remote)){apply(profile.username,remote);location.reload();}
   }
   function ensureGate(){
     let g=document.getElementById('loginGate');
@@ -65,7 +82,11 @@
   }
   boot();
   const logout=document.getElementById('logoutBtn');if(logout)logout.onclick=async()=>{await save();await db.auth.signOut();localStorage.removeItem(CACHE);localStorage.removeItem('verisureCurrentUser');localStorage.removeItem('verisureCurrentRole');location.reload();};
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save();});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save();else pull();});
+  window.addEventListener('focus',pull);
+  window.addEventListener('pagehide',save);
+  setInterval(pull,15000);
+  window.controlVerisureSyncNow=async()=>{await save();await pull();};
   async function drawUsers(){
     const list=document.getElementById('userList');if(!list||profile?.role!=='MASTER')return;
     const {data,error:e}=await db.from('profiles').select('username,role').order('username');if(e){list.textContent='No se pudieron cargar los usuarios.';return;}
