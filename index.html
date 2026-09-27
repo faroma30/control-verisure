@@ -34,6 +34,8 @@ html,body{max-width:100%;overflow-x:hidden}.main,.card,.cardhead,.filters{min-wi
   .main{padding:16px 10px 34px}.topbar{gap:10px}.eyebrow{font-size:.75rem}.topbar-actions{gap:6px}.topbar-actions .primary{padding:10px 12px;font-size:.88rem}.cardhead{padding:14px 12px}.filters{grid-template-columns:1fr}.filters>*{grid-column:1!important}.tablewrap table{min-width:900px}.tablewrap th,.tablewrap td{padding:11px 12px;min-width:120px;width:120px;font-size:.8rem}.tablewrap th:first-child,.tablewrap td:first-child{min-width:110px;width:110px}body .ref-grid{grid-template-columns:1fr!important}.tablewrap:has(.ref-grid) table{min-width:0!important}.ref-card{font-size:.86rem!important}.note-card{padding:15px}.notes-library .note-image-row{grid-template-columns:1fr!important}.notes-library .note-image-row .note-full-image{height:auto!important;max-height:480px!important}.actions{flex-direction:column-reverse}.actions button{width:100%}.modal{padding:18px}.login-gate{align-items:start;padding-top:max(24px,env(safe-area-inset-top))}.login-card{width:calc(100% - 20px);padding:22px;border-radius:14px}.login-card h1{font-size:24px}.user-row{align-items:flex-start;gap:10px}.user-row button{flex:0 0 auto}
 }
 @media(max-width:520px){
+  .sidebar{left:-320px!important}
+  .sidebar.open{left:0!important}
   body .tablewrap:has(.ref-grid){overflow:visible!important}
   body .ref-grid{padding:14px 8px 8px!important;gap:14px!important;align-items:start!important}
   body .ref-card{min-height:0!important;padding:18px 12px 11px!important;line-height:1.32!important}
