@@ -573,4 +573,23 @@ const selectFinalHistories=select;select=name=>{selectFinalHistories(name);if(ol
   compactEmptyReferidoFields();
 })();
 </script>
+<script>
+(()=>{
+  const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+  const stateSelect=document.getElementById('referidosEstado');
+  if(!stateSelect)return;
+  const originalRender=renderRows;
+  const applyState=filter=>{
+    if(active!=='Referidos')return;
+    const query=normalize(filter),state=normalize(stateSelect.value);
+    const rows=(config.Referidos.rows||[]).filter(row=>!query||row.join(' ').toLowerCase().includes(query));
+    document.querySelectorAll('.ref-card').forEach((card,index)=>{const row=rows[index];card.style.display=!state||normalize(row?.[9])===state?'':'none';});
+  };
+  renderRows=filter=>{originalRender(filter);applyState(filter||'');};
+  stateSelect.onchange=()=>renderRows(document.getElementById('search')?.value||'');
+  const originalSelect=select;
+  select=name=>{originalSelect(name);if(name==='Referidos'){stateSelect.hidden=false;renderRows(document.getElementById('search')?.value||'');}else stateSelect.hidden=true;};
+  setTimeout(()=>{if(active==='Referidos')stateSelect.hidden=false;},0);
+})();
+</script>
 </html>
