@@ -601,6 +601,25 @@ const selectFinalHistories=select;select=name=>{selectFinalHistories(name);if(ol
   setTimeout(()=>{if(active==='Referidos')stateSelect.hidden=false;},0);
 })();
 </script>
+<script>
+(()=>{
+  const sel=document.getElementById('referidosEstado');
+  if(!sel)return;
+  const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+  const apply=()=>{
+    if(typeof active==='undefined'||active!=='Referidos')return;
+    const wanted=norm(sel.value), cards=[...document.querySelectorAll('.ref-card')];
+    cards.forEach(card=>{
+      const state=[...card.querySelectorAll('div')].find(x=>/^Estado:/i.test(x.textContent||''));
+      card.style.display=!wanted||norm((state?.textContent||'').replace(/^Estado:\s*/i,''))===wanted?'':'none';
+    });
+  };
+  sel.addEventListener('change',()=>setTimeout(apply,0));
+  sel.addEventListener('input',()=>setTimeout(apply,0));
+  sel.addEventListener('blur',apply);
+  setInterval(apply,800);
+})();
+</script>
 </html>
 
 
