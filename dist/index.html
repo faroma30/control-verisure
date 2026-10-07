@@ -644,6 +644,7 @@ const applyFinalPresentation=()=>{
 };
 const finalSelect=select;
 select=name=>{finalSelect(name);applyFinalPresentation();};
+document.getElementById('nav')?.addEventListener('click',()=>applyFinalPresentation());
 select(initialSection);
 applyFinalPresentation();
 </script>
