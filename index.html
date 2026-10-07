@@ -637,6 +637,7 @@ console.log('[NAV]',{hash:location.hash,title:document.getElementById('title')?.
 // Bootstrap final: todos los módulos y wrappers ya están registrados. Build 178290a.
 const applyFinalPresentation=()=>{
   const section=active;
+  document.body.dataset.section=section;
   if(section==='Referidos'){
     ['stockManage','stockCount','stockImport','stockCapture','stockClear','stockReturn','manualClosureValues','editCells'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true;});
   }
@@ -648,6 +649,17 @@ document.getElementById('nav')?.addEventListener('click',()=>applyFinalPresentat
 select(initialSection);
 applyFinalPresentation();
 </script>
+<style>
+body[data-section="Referidos"] #stockManage,
+body[data-section="Referidos"] #stockCount,
+body[data-section="Referidos"] #stockImport,
+body[data-section="Referidos"] #stockCapture,
+body[data-section="Referidos"] #stockClear,
+body[data-section="Referidos"] #stockReturn,
+body[data-section="Referidos"] #manualClosureValues,
+body[data-section="Referidos"] #editCells,
+body[data-section="Horas Extras"] .filters > *{display:none!important}
+</style>
 </body>
 </html>
 
