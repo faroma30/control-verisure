@@ -635,15 +635,17 @@ console.log('[NAV]',{hash:location.hash,title:document.getElementById('title')?.
 </script>
 <script>
 // Bootstrap final: todos los módulos y wrappers ya están registrados. Build 178290a.
+const applyFinalPresentation=()=>{
+  const section=active;
+  if(section==='Referidos'){
+    ['stockManage','stockCount','stockImport','stockCapture','stockClear','stockReturn','manualClosureValues','editCells'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true;});
+  }
+  if(section==='Horas Extras') document.querySelectorAll('.filters > *').forEach(el=>{el.hidden=true;});
+};
+const finalSelect=select;
+select=name=>{finalSelect(name);applyFinalPresentation();};
 select(initialSection);
-// La presentación específica debe prevalecer sobre los controles genéricos
-// que algunos módulos históricos añaden durante la carga.
-if(active==='Referidos'){
-  ['stockManage','stockCount','stockImport','stockCapture','stockClear','stockReturn','manualClosureValues','editCells'].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=true;});
-}
-if(active==='Horas Extras'){
-  document.querySelectorAll('.filters > *').forEach(el=>{if(!el.classList.contains('hours-extra-filter'))el.hidden=true;});
-}
+applyFinalPresentation();
 </script>
 </body>
 </html>
