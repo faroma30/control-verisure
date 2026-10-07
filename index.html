@@ -67,7 +67,8 @@ html,body{max-width:100%;overflow-x:hidden}.main,.card,.cardhead,.filters{min-wi
     <section class="stats" id="stats"></section>
     <section class="card">
       <div class="cardhead"><div><h2 id="listTitle">Movimientos recientes</h2><p id="listSub">Últimos registros de la categoría</p></div><div class="filters"><select class="secondary" id="sortStock" aria-label="Ordenar tabla"><option value="default">Ordenar…</option><option value="refAsc">Referencia A-Z / menor a mayor</option><option value="refDesc">Referencia Z-A / mayor a menor</option><option value="techAsc">Tecnología A-Z</option><option value="techDesc">Tecnología Z-A</option></select><input class="search" id="search" type="search" placeholder="Buscar registros…" aria-label="Buscar registros"><button class="secondary" id="stockManage" hidden>Gestionar referencias</button><button class="secondary" id="stockCount" hidden>Nuevo recuento</button></div></div>
-      <div class="tablewrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+      <div class="tablewrap" id="recordsWrap"><table id="recordsTable"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+      <div id="referidosGrid" class="ref-grid" hidden aria-live="polite"></div>
     </section>
   </main>
 </div>
@@ -631,6 +632,33 @@ console.log('[NAV]',{hash:location.hash,title:document.getElementById('title')?.
     document.querySelector('#notesLibrary')?.classList.add('show');
   };
   if(document.querySelector('#title')?.textContent==='Apuntes') document.querySelector('#notesLibrary')?.classList.add('show');
+})();
+</script>
+<script>
+// Referidos se renderiza en un contenedor independiente: nunca se insertan tarjetas dentro de TBODY.
+(()=>{
+  const grid=document.getElementById('referidosGrid'), wrap=document.getElementById('recordsWrap');
+  if(!grid||!wrap)return;
+  const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const previousRender=renderRows;
+  const renderReferidos=filter=>{
+    const query=norm(filter), state=norm(document.getElementById('referidosEstado')?.value);
+    const rows=(config.Referidos?.rows||[]).filter(row=>{
+      const text=row.join(' ');
+      return (!query||norm(text).includes(query))&&(!state||norm(row[9])===state);
+    });
+    grid.innerHTML=rows.length?rows.map(row=>'<article class="ref-card"><div class="ref-badge">Núm inst: '+(row[0]||'—')+'</div>'+row.slice(1).map((value,index)=>'<div><strong>'+config.Referidos.cols[index+1]+':</strong> '+(value||'—')+'</div>').join('')+(norm(row[9])==='facturada'?'<div class="ref-payment">Pago: Pendiente</div>':'')+'</article>').join(''):'<p class="empty">No hay referidos.</p>';
+  };
+  renderRows=filter=>{
+    if(active==='Referidos'){
+      wrap.hidden=true; grid.hidden=false; renderReferidos(filter||'');
+    }else{
+      wrap.hidden=false; grid.hidden=true; previousRender(filter||'');
+    }
+  };
+  const search=document.getElementById('search'), state=document.getElementById('referidosEstado');
+  state?.addEventListener('change',()=>{if(active==='Referidos')renderRows(search?.value||'');});
+  if(active==='Referidos')renderRows(search?.value||'');
 })();
 </script>
 <script>
